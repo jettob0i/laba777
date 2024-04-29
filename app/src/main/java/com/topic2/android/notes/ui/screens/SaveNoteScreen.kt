@@ -37,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.material.Scaffold
 import android.annotation.SuppressLint
+import androidx.compose.material.Switch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -114,6 +115,27 @@ private fun SaveNoteTopAppBar(
 }
 
 @Composable
+private fun NoteCheckOption(
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        Modifier
+            .padding(8.dp)
+            .padding(top = 16.dp)
+    ) {
+        Text(
+            text = "Can note be checked off?", modifier = Modifier.weight(1f)
+        )
+        Switch(
+            checked = isChecked,
+            onCheckedChange = onCheckedChange, modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+}
+
+
+@Composable
 private fun PickedColor(color: ColorModel) {
     Row(
         Modifier
@@ -144,6 +166,13 @@ fun SaveNoteTopAppBarPreview() {
         onDeleteNoteClick = {}
     )
 }
+
+@Preview
+@Composable
+fun NoteCheckOptionPreview() {
+    NoteCheckOption(false) {}
+}
+
 
 @Preview
 @Composable
