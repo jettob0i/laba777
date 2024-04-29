@@ -19,13 +19,14 @@ import com.google.android.material.internal.ViewUtils.RelativePadding
 
 @Composable
 fun NoteColor(
+    modifier: Modifier = Modifier,
     color: Color,
     size: Dp,
     padding: Dp = 0.dp,
     border: Dp
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .padding(padding)
             .size(size)
             .clip(CircleShape)
