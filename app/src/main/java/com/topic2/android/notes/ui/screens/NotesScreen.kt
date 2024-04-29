@@ -15,6 +15,12 @@ import com.topic2.android.notes.ui.components.Note
 import com.topic2.android.notes.ui.components.TopAppBar
 import com.topic2.android.notes.viewmodel.MainViewModel
 import androidx.compose.material.Scaffold
+import kotlinx.coroutines.launch
+import com.topic2.android.notes.routing.Screen
+import com.topic2.android.notes.ui.components.AppDrawer
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material.ScaffoldState
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -24,12 +30,30 @@ fun NotesScreen(viewModel: MainViewModel) {
         .notesNotInTrash
         .observeAsState(listOf())
 
+    val scaffoldState: ScaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+
     Scaffold(topBar = {
         TopAppBar(
             title = "Notes",
-            icon = Icons.Filled.List, onIconClick = {}
+            icon = Icons.Filled.List,
+            onIconClick = {
+                coroutineScope.launch {
+                    scaffoldState.drawerState.open()
+                }
+            }
         )
     },
+        scaffoldState = scaffoldState,
+        drawerContent = {
+            AppDrawer(
+                currentScreen = Screen.Notes, closeDrawerAction = {
+                    coroutineScope.launch {
+                        scaffoldState.drawerState.close()
+                    }
+                }
+            )
+        },
         content = {
             if (notes.isNotEmpty()) {
                 NotesList(
