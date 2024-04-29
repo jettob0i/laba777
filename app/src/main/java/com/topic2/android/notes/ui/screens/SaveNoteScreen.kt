@@ -49,6 +49,12 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.rememberBottomDrawerState
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import androidx.activity.compose.BackHandler
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.TextButton
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.mutableStateOf
 
 @ExperimentalMaterialApi
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -60,6 +66,20 @@ fun SaveNoteScreen(viewModel: MainViewModel) {
         .observeAsState(listOf())
     val bottomDrawerState: BottomDrawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
+
+    val moveNoteToTrashDialogShownState: MutableState<Boolean> = rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    BackHandler(
+        onBack = {
+            if (bottomDrawerState.isOpen) {
+                coroutineScope.launch { bottomDrawerState.close() }
+            } else {
+                NotesRouter.navigateTo(Screen.Notes)
+            }
+        }
+    )
 
     Scaffold(topBar = {
         val isEditingMode: Boolean = noteEntry.id != NEW_NOTE_ID
@@ -75,7 +95,7 @@ fun SaveNoteScreen(viewModel: MainViewModel) {
                 coroutineScope.launch { bottomDrawerState.open() }
             },
             onDeleteNoteClick = {
-                viewModel.moveNoteToTrash(noteEntry)
+                moveNoteToTrashDialogShownState.value = true
             }
         )
     },
@@ -99,6 +119,36 @@ fun SaveNoteScreen(viewModel: MainViewModel) {
                     )
                 }
             )
+            if ( moveNoteToTrashDialogShownState.value) {
+                AlertDialog(
+                    onDismissRequest = {
+                        moveNoteToTrashDialogShownState.value = false
+                    },
+                    title = {
+                        Text("Move note to the trash?")
+                    },
+                    text = {
+                        Text(
+                            "Are you sure you want to " +
+                                    "move this note to the trash?"
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            viewModel.moveNoteToTrash(noteEntry)
+                        }) {
+                            Text("Confirm")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {
+                            moveNoteToTrashDialogShownState.value = false
+                        }) {
+                            Text("Dismiss")
+                        }
+                    }
+                )
+            }
         }
     )
 }
