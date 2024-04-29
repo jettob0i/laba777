@@ -38,6 +38,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.material.Scaffold
 import android.annotation.SuppressLint
 import androidx.compose.material.Switch
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -115,6 +117,27 @@ private fun SaveNoteTopAppBar(
 }
 
 @Composable
+private fun ContentTextField(
+    modifier: Modifier = Modifier,
+    label: String,
+    text: String,
+    onTextChange: (String) -> Unit
+) {
+    TextField(
+        value = text,
+        onValueChange = onTextChange,
+        label = { Text(label) },
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = MaterialTheme.colors.surface
+        )
+    )
+}
+
+
+@Composable
 private fun NoteCheckOption(
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit
@@ -166,6 +189,17 @@ fun SaveNoteTopAppBarPreview() {
         onDeleteNoteClick = {}
     )
 }
+
+@Preview
+@Composable
+fun ContentTextFieldPreview() {
+    ContentTextField(
+        label = "Title",
+        text = "",
+        onTextChange = {}
+    )
+}
+
 
 @Preview
 @Composable
