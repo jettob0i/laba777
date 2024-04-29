@@ -42,11 +42,24 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.BottomDrawer
+import androidx.compose.material.BottomDrawerState
+import androidx.compose.material.BottomDrawerValue
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.rememberBottomDrawerState
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
+@ExperimentalMaterialApi
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SaveNoteScreen(viewModel: MainViewModel) {
     val noteEntry: NoteModel by viewModel.noteEntry.observeAsState(NoteModel())
+
+    val colors: List<ColorModel> by viewModel.colors
+        .observeAsState(listOf())
+    val bottomDrawerState: BottomDrawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(topBar = {
         val isEditingMode: Boolean = noteEntry.id != NEW_NOTE_ID
@@ -58,17 +71,32 @@ fun SaveNoteScreen(viewModel: MainViewModel) {
             onSaveNoteClick = {
                 viewModel.saveNote(noteEntry)
             },
-            onOpenColorPickerClick = { },
+            onOpenColorPickerClick = {
+                coroutineScope.launch { bottomDrawerState.open() }
+            },
             onDeleteNoteClick = {
                 viewModel.moveNoteToTrash(noteEntry)
             }
         )
     },
         content = {
-            SaveNoteContent(
-                note = noteEntry,
-                onNoteChange = { updateNoteEntry ->
-                    viewModel.onNoteEntryChange(updateNoteEntry)
+            BottomDrawer(
+                drawerState = bottomDrawerState,
+                drawerContent = {
+                    ColorPicker(colors = colors,
+                        onColorSelect = { color ->
+                            val newNoteEntry = noteEntry.copy(color = color)
+                            viewModel.onNoteEntryChange(newNoteEntry)
+                        }
+                    )
+                },
+                content = {
+                    SaveNoteContent(
+                        note = noteEntry,
+                        onNoteChange = { updateNoteEntry ->
+                            viewModel.onNoteEntryChange(updateNoteEntry)
+                        }
+                    )
                 }
             )
         }
