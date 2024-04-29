@@ -26,6 +26,9 @@ import androidx.compose.material.FabPosition
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.IconButton
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -38,13 +41,27 @@ fun NotesScreen(viewModel: MainViewModel) {
     val scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(topBar = {
+    Scaffold(
+        topBar = {
         TopAppBar(
-            title = "Notes",
-            icon = Icons.Filled.List,
-            onIconClick = {
-                coroutineScope.launch {
-                    scaffoldState.drawerState.open()
+            title = {
+                Text(
+                    text = "Notes",
+                    color = MaterialTheme.colors.onPrimary
+                )
+            },
+            navigationIcon = {
+                IconButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            scaffoldState.drawerState.open()
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.List,
+                        contentDescription = "Drawer Button"
+                    )
                 }
             }
         )
